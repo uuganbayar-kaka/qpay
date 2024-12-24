@@ -10,6 +10,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// GlVersion :
+var GlVersion string
+
+// GlBuildDate :
+var GlBuildDate string
+
+// GlRunMode :
+var GlRunMode string
+
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, World!")
 }
@@ -41,6 +50,16 @@ func main() {
 	r.HandleFunc("/", HelloWorld)
 	r.HandleFunc("/ping", pingHandler)
 	http.Handle("/", r)
+
+	glSysStatus.Status = "OK"
+	glSysStatus.Ret.BuildDate = GlBuildDate
+
+	glSysStatus.Ret.Version = GlVersion
+	glSysStatus.Ret.RunMode = GlRunMode
+	glSysStatus.Ret.ResponseCode = "000"
+	glSysStatus.Ret.ResponseMsg = "Normalno"
+	glSysStatus.Ret.ServiceName = "QPAY"
+	glSysStatus.Ret.StartTime = time.Now()
 
 	fmt.Println("Server is running on port 8000...")
 	log.Fatal(http.ListenAndServe(":8000", nil))
