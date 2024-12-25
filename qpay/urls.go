@@ -8,7 +8,7 @@ func LinkHandlersV1(router *mux.Router) {
 	// QPay
 	// router.HandleFunc("v1/ping", PingHandler).Methods("GET")
 
-	// router.HandleFunc("v1/get_invoice/simple", GetInvoiceSimpleHandler).Methods("GET")
+	router.HandleFunc("v1/get_invoice/simple", CreateInvoiceSimple).Methods("GET")
 	// router.HandleFunc("v1/get_invoice/", GetInvoiceHandler).Methods("GET")
 	// router.HandleFunc("v1/cancel_invoice/", CancelInvoiceHandler).Methods("POST")
 
