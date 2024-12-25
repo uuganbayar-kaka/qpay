@@ -26,6 +26,20 @@ const (
 // Cache instance (in-memory, replace with Redis or other if needed)
 var appCache = cache.New(5*time.Minute, 10*time.Minute)
 
+func PingHandler(res http.ResponseWriter, req *http.Request) {
+	var data PingData
+
+	res.Header().Set(CONTENTTYPE, APPLICATIONJSON)
+	encoder := json.NewEncoder(res)
+	data.Module = AppName
+	data.Version = StatusCodeOK
+	data.RunMode = GlRunMode
+	data.BuildDate = GlBuildDate
+	data.StartTime = time.Now()
+	data.Developer = "kaka"
+	encoder.Encode(data)
+}
+
 // QPayGetToken retrieves a QPay access token
 func QPayGetToken(invoiceNo string) (string, error) {
 	terminalID := "91909029"

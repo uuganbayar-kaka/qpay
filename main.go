@@ -1,13 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"time"
+	"os"
+	"qpay/qpay"
 
-	"github.com/gorilla/mux"
+	"github.com/gorilla/handlers"
 )
 
 // GlVersion :
@@ -19,48 +19,34 @@ var GlBuildDate string
 // GlRunMode :
 var GlRunMode string
 
-func HelloWorld(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, World!")
-}
+// func main() {
+// 	router := mux.NewRouter()
 
-type PingResp struct {
-	Status string `json:"status_code"`
-	Ret    struct {
-		ResponseCode string      `json:"resp_code,omitempty"`
-		ResponseMsg  string      `json:"resp_msg,omitempty"`
-		BuildDate    string      `json:"build_date"`
-		Version      string      `json:"version"`
-		RunMode      string      `json:"run_mode"`
-		ServiceName  string      `json:"service_name"`
-		StartTime    time.Time   `json:"start_time,omitempty"`
-		Info         interface{} `json:"info,omitempty"`
-	} `json:"ret,omitempty"`
-}
+// 	qpay.LinkHandlersV1(router)
 
-var glSysStatus PingResp
-
-func pingHandler(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	encoder := json.NewEncoder(w)
-	encoder.Encode(glSysStatus)
-}
+// 	fmt.Println("Server is running on port 4000...")
+// 	log.Fatal(http.ListenAndServe(":4000", nil))
+// }
 
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/", HelloWorld)
-	r.HandleFunc("/ping", pingHandler)
-	http.Handle("/", r)
+	router := qpay.LinkHandlersV1() // Set up the application's configuration
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello, QPay Middleware!"))
+	})
 
-	glSysStatus.Status = "OK"
-	glSysStatus.Ret.BuildDate = GlBuildDate
+	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 
-	glSysStatus.Ret.Version = GlVersion
-	glSysStatus.Ret.RunMode = GlRunMode
-	glSysStatus.Ret.ResponseCode = "000"
-	glSysStatus.Ret.ResponseMsg = "Normalno"
-	glSysStatus.Ret.ServiceName = "QPAY"
-	glSysStatus.Ret.StartTime = time.Now()
+	// Create an HTTP server
+	httpServer := &http.Server{
+		Addr:    "0.0.0.0:4000",
+		Handler: loggedRouter,
+	}
 
-	fmt.Println("Server is running on port 8000...")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	// Start the server
+	log.Println("Server is running on port 4000")
+	listenErr := httpServer.ListenAndServe() // Listen and serve incoming requests
+	if listenErr != nil {
+		fmt.Printf("REST SERVER LISTEN ERROR [%s]\n", listenErr.Error()) // Log the error
+		os.Exit(2)                                                       // Exit the program with error status
+	}
 }

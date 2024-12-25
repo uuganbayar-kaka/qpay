@@ -1,9 +1,16 @@
 package qpay
 
+import "time"
+
+var BindPortRest *string
+
+var GlRunMode string
+var GlBuildDate string
+
 const (
 	// basic constant values
 	TCPServer              = "tcp"
-	AppName                = "TANK VATPSMIDDLEWARE"
+	AppName                = "QPay Middleware"
 	TIMELOCATION           = "Asia/Ulaanbaatar"
 	StatusCodeOK           = "Ok"
 	StatusCodeNotOk        = "Ng"
@@ -105,6 +112,15 @@ const (
 	StatusNotExtended                   = 510 // RFC 2774, 7
 	StatusNetworkAuthenticationRequired = 511 // RFC 6585, 6
 )
+
+type PingData struct {
+	Module    string    `json:"module"`
+	Version   string    `json:"version"`
+	RunMode   string    `json:"run_mode"`
+	BuildDate string    `json:"build_date"`
+	StartTime time.Time `json:"start_time"`
+	Developer string    `json:"developer"`
+}
 
 type ResponseBuilder struct {
 	// Status Code Indicating State of Request
