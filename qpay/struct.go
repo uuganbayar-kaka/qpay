@@ -161,7 +161,7 @@ type InvoiceResponse struct {
 }
 
 type InvoiceSimpleData struct {
-	Amount string `json:"amount"`
+	Amount float64 `json:"amount"`
 }
 
 type InvoiceData struct {

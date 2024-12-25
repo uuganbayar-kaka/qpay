@@ -81,7 +81,7 @@ func QPayGetToken(invoiceNo string) (string, error) {
 		return "", err
 	}
 
-	appCache.Set(invoiceNo, tokenResp, cache.DefaultExpiration)
+	appCache.Set(invoiceNo, tokenResp.AccessToken, cache.DefaultExpiration)
 	return tokenResp.AccessToken, nil
 }
 

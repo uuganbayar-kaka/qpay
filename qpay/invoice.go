@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 )
 
@@ -17,6 +15,7 @@ func CreateInvoiceSimple(res http.ResponseWriter, req *http.Request) {
 	var reqDta InvoiceSimpleData
 	var responseException ResponseExceptionBuilder
 	var response ResponseBuilder
+	log.Printf("req.Body %v", req.Body)
 
 	bodyByte, bodyErr := RequestExtract(req.Body)
 	if bodyErr != nil {
@@ -36,15 +35,7 @@ func CreateInvoiceSimple(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var amount float64
-	strAmount := strings.TrimSpace(reqDta.Amount)
-	amount, intErr := strconv.ParseFloat(strAmount, 64)
-	if intErr != nil {
-		return
-	}
-	if amount <= 0 {
-		return
-	}
+	log.Printf("reqDta %v\n", reqDta)
 
 	invoiceNo := time.Now().Format("20060102150405")
 	log.Printf("Invoice No: %s", invoiceNo)
@@ -56,7 +47,7 @@ func CreateInvoiceSimple(res http.ResponseWriter, req *http.Request) {
 		SenderInvoiceNo:     invoiceNo,
 		InvoiceReceiverCode: "91909029",
 		InvoiceDescription:  "test",
-		Amount:              amount,
+		Amount:              reqDta.Amount,
 		CallbackURL:         "https://example.com/payments?payment_id=91909029",
 	}
 	body, _ := json.Marshal(payload)
@@ -85,6 +76,15 @@ func CreateInvoiceSimple(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	token, found := appCache.Get(invoiceNo)
+	fmt.Printf("invoiceNo value for %s\n %s\n", invoiceNo, token)
+	if found {
+		fmt.Printf("Cached value for %s: %s\n", invoiceNo, token)
+	} else {
+		fmt.Printf("No value found for %s\n", invoiceNo)
+	}
+
+	log.Printf("token %s\n", token)
 	response.Data = invoiceResp
 	response.StatusCode = StatusOK
 	Response(res, response)
